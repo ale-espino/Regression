@@ -3,22 +3,37 @@ title: "Introduction to Regression in R"
 output: html_notebook
 ---
 
-```{r}
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(readxl)
+library(ggplot2)
 library(carData)
+plomo <- read.csv("plomo.csv")
 ```
 
+4.  What is regression? Regression models are a class of statistical models that let you explore the relationship between a response variable and some explanatory variables. That is, given some explanatory variables, you can make predictions about the value of the response variable. In the insurance dataset, if you know the number of claims made in a region, you can predict the amount that the insurance company has to pay out. That lets you do thought experiments like asking how much the company would need to pay if the number of claims increased to two hundred.
 
-4. What is regression?
-Regression models are a class of statistical models that let you explore the relationship between a response variable and some explanatory variables. That is, given some explanatory variables, you can make predictions about the value of the response variable. In the insurance dataset, if you know the number of claims made in a region, you can predict the amount that the insurance company has to pay out. That lets you do thought experiments like asking how much the company would need to pay if the number of claims increased to two hundred.
+Los modelos de regresión son una clase de modelos estadísticos que le permiten explorar la relación entre una variable de respuesta y algunas variables explicativas. Es decir, dadas algunas variables explicativas, puede hacer predicciones sobre el valor de la variable respuesta. La variable de respuesta, sobre la que desea hacer predicciones, también se conoce como variable dependiente. Estos dos términos son completamente intercambiables. Las variables explicativas, que se utilizan para explicar cómo cambiarán las predicciones, también se conocen como variables independientes.
 
-Los modelos de regresión son una clase de modelos estadísticos que le permiten explorar la relación entre una variable de respuesta y algunas variables explicativas. Es decir, dadas algunas variables explicativas, puede hacer predicciones sobre el valor de la variable respuesta. 
-La variable de respuesta, sobre la que desea hacer predicciones, también se conoce como variable dependiente. Estos dos términos son completamente intercambiables.
-Las variables explicativas, que se utilizan para explicar cómo cambiarán las predicciones, también se conocen como variables independientes. 
+La regresión lineal se utiliza cuando la variable de respuesta es numérica, mientras que la regresión logística se utiliza cuando la variable de respuesta es lógica, es decir, toma valores verdaderos o falsos.
 
-La regresión lineal se utiliza cuando la variable de respuesta es numérica, mientras que la regresión logística se utiliza cuando la variable de respuesta es lógica, es decir, toma valores verdaderos o falsos. 
+Al gráfico de dispersión se le puede agregar una línea de tendencia, es decir, ajustar una línea que sigue los puntos de datos. En `ggplot`, las líneas de tendencia se agregan usando `geom_smooth()`. Al establecer el argumento del método en `lm`, para un "modelo lineal", se obtiene una línea con tendencia calculada con una regresión lineal. La función `geom_smooth()` muestra una cinta de error estandar, que en este caso se desactivará.
 
 ```{r}
-ggplot(Arrests, aes(n_claims, total_payment))
+ggplot(plomo, aes(Plomo, IQ)) + geom_point() + geom_smooth(method = "lm", se = FALSE)
 ```
 
+# Ajustando una regresión lineal
 
+Una característica importante de la regresión lineal es que, las líneas de tendencia en los gráficos, son líneas rectas. Las líneas rectas están definidas por dos propiedades. El intercepto es el valor de *y* cuando *x* es cero, la pendiente o en inglés, *"slope"*, es la inclinación de la línea, igual a la cantidad que *y* aumenta si *x* aumenta en uno.
+
+La ecuación para una línea recta es:
+
+$y = intercepto + pendiente \cdot x$
+
+Para ejecutar un modelo de regresión lineal, se llama a la función `lm` con dos argumentos. El primero es una fórmula, la variable respuesta se escribe del lado izquierdo de la virgulilla **(\~)** y la variable explicativa del lado derecho; el segundo argumento, son los datos de los cuales se está importando la información.
+
+```{r}
+#El primer argumento que se imprime es el intercepto
+# y el segundo es la pendiente
+lm(IQ~Plomo, data = plomo)
+```
