@@ -1,0 +1,24 @@
+---
+title: "Introduction to Regression in R"
+output: html_notebook
+---
+
+```{r}
+library(carData)
+```
+
+
+4. What is regression?
+Regression models are a class of statistical models that let you explore the relationship between a response variable and some explanatory variables. That is, given some explanatory variables, you can make predictions about the value of the response variable. In the insurance dataset, if you know the number of claims made in a region, you can predict the amount that the insurance company has to pay out. That lets you do thought experiments like asking how much the company would need to pay if the number of claims increased to two hundred.
+
+Los modelos de regresión son una clase de modelos estadísticos que le permiten explorar la relación entre una variable de respuesta y algunas variables explicativas. Es decir, dadas algunas variables explicativas, puede hacer predicciones sobre el valor de la variable respuesta. 
+La variable de respuesta, sobre la que desea hacer predicciones, también se conoce como variable dependiente. Estos dos términos son completamente intercambiables.
+Las variables explicativas, que se utilizan para explicar cómo cambiarán las predicciones, también se conocen como variables independientes. 
+
+La regresión lineal se utiliza cuando la variable de respuesta es numérica, mientras que la regresión logística se utiliza cuando la variable de respuesta es lógica, es decir, toma valores verdaderos o falsos. 
+
+```{r}
+ggplot(Arrests, aes(n_claims, total_payment))
+```
+
+
