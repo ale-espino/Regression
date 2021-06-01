@@ -8,7 +8,6 @@ library(readxl)
 library(ggplot2)
 library(carData)
 library(palmerpenguins)
-plomo <- read.csv("plomo.csv")
 ```
 
 # Regresión Lineal Simple
@@ -19,7 +18,7 @@ La regresión lineal se utiliza cuando la variable de respuesta es numérica, mi
 Al gráfico de dispersión se le puede agregar una línea de tendencia, es decir, ajustar una línea que sigue los puntos de datos. En `ggplot`, las líneas de tendencia se agregan usando `geom_smooth()`. Al establecer el argumento del método en `lm`, para un "modelo lineal", se obtiene una línea con tendencia calculada con una regresión lineal. La función `geom_smooth()` muestra una cinta de error estandar, que en este caso se desactivará.
 
 ```{r}
-ggplot(plomo, aes(Plomo, IQ)) + geom_point() + geom_smooth(method = "lm", se = FALSE)
+ggplot(penguins, aes(flipper_length_mm, body_mass_g)) + geom_point() + geom_smooth(method = "lm", se = FALSE) + theme_light()
 ```
 
 ## Ajustando una regresión lineal
@@ -35,7 +34,7 @@ Para ejecutar un modelo de regresión lineal, se llama a la función `lm` con do
 ```{r}
 #El primer argumento que se imprime es el intercepto
 # y el segundo es la pendiente
-lm(IQ~Plomo, data = plomo)
+lm(body_mass_g~flipper_length_mm, data = penguins)
 ```
 
 ## Regresión con variables categóricas
@@ -43,7 +42,7 @@ lm(IQ~Plomo, data = plomo)
 Pa visualizar datos en los que se contienen variables categóricas es mejor adaptar con la función `facet_wrap()` la división según su categoría, como se muestra en el siguiente chunk.
 
 ```{r}
-ggplot(penguins, aes(body_mass_g)) + geom_histogram() + facet_wrap(vars(species))
+ggplot(penguins, aes(body_mass_g)) + geom_histogram() + facet_wrap(vars(species)) + theme_light()
 ```
 
 Al aplicar la regresión lineal
