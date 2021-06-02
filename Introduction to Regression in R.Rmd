@@ -55,3 +55,4 @@ lm(body_mass_g ~ species + 0, data = penguins)
 
 # Predicciones y modelos
 
+Antes de hacer predicciones, necesitamos un modelo. El principio detrás de la predicción es hacer preguntas de la forma "si establezco las variables explicativas de estos valores, ¿qué valor tendría la variable de respuesta?", eso significa que el siguiente paso es elegir algunos valores para las variables explicativas.
