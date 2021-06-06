@@ -4,20 +4,21 @@ output: html_notebook
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
-library(readxl)
 library(ggplot2)
-library(carData)
 library(palmerpenguins)
+library(dplyr)
+library(broom)
 ```
 
 # Regresión Lineal Simple
+
 Los modelos de regresión son una clase de modelos estadísticos que le permiten explorar la relación entre una variable de respuesta y algunas variables explicativas. Es decir, dadas algunas variables explicativas, puede hacer predicciones sobre el valor de la variable respuesta. La variable de respuesta, sobre la que desea hacer predicciones, también se conoce como variable dependiente. Estos dos términos son completamente intercambiables. Las variables explicativas, que se utilizan para explicar cómo cambiarán las predicciones, también se conocen como variables independientes.
 
 La regresión lineal se utiliza cuando la variable de respuesta es numérica, mientras que la regresión logística se utiliza cuando la variable de respuesta es lógica, es decir, toma valores verdaderos o falsos.
 
 Al gráfico de dispersión se le puede agregar una línea de tendencia, es decir, ajustar una línea que sigue los puntos de datos. En `ggplot`, las líneas de tendencia se agregan usando `geom_smooth()`. Al establecer el argumento del método en `lm`, para un "modelo lineal", se obtiene una línea con tendencia calculada con una regresión lineal. La función `geom_smooth()` muestra una cinta de error estandar, que en este caso se desactivará.
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 ggplot(penguins, aes(flipper_length_mm, body_mass_g)) + geom_point() + geom_smooth(method = "lm", se = FALSE) + theme_light()
 ```
 
@@ -41,7 +42,7 @@ lm(body_mass_g~flipper_length_mm, data = penguins)
 
 Pa visualizar datos en los que se contienen variables categóricas es mejor adaptar con la función `facet_wrap()` la división según su categoría, como se muestra en el siguiente chunk.
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 ggplot(penguins, aes(body_mass_g)) + geom_histogram() + facet_wrap(vars(species)) + theme_light()
 ```
 
@@ -56,3 +57,77 @@ lm(body_mass_g ~ species + 0, data = penguins)
 # Predicciones y modelos
 
 Antes de hacer predicciones, necesitamos un modelo. El principio detrás de la predicción es hacer preguntas de la forma "si establezco las variables explicativas de estos valores, ¿qué valor tendría la variable de respuesta?", eso significa que el siguiente paso es elegir algunos valores para las variables explicativas.
+
+```{r}
+modelo <- lm(body_mass_g ~ flipper_length_mm, data = penguins)
+
+explanatory_data <- tibble(flipper_length_mm = 180:210)
+
+#Ahora utilizamos la función `predict`
+predict(modelo, explanatory_data)
+```
+
+La función `predict()` devuelve un vector de predicciones, una para cada fila de los datos explicativos, pero no es muy útil tener esta función para programar, es más fácil trabajar con las predicciones si están en un `data.frame` junto con las variables explicativas.
+
+```{r}
+prediction_data <- explanatory_data %>% 
+  mutate(body_mass_g = predict(
+    modelo, explanatory_data
+  ))
+prediction_data
+```
+
+Así, podemos ver las predicciones de la masa corporal, según sea la longitud de la aleta. Ahora agregamos estas predicciones a la gráfica y podremos notar que las predicciones se encuentran exactamente en la línea de tendencia.
+
+```{r, message=FALSE, warning=FALSE}
+ggplot(penguins, aes(flipper_length_mm, body_mass_g)) +
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(
+    data = prediction_data,
+    color = "blue"
+  ) + theme_light()
+```
+
+El modelo lineal nos permite hacer predicciones fuera del rango de los datos observados, a esto se le llama *extrapolación.* La extrapolación a veces es apropiada, pero puede dar lugar a resultados engañosos o ridículos. Por esto, se debe observar los datos y saber qué se está prediciendo.
+
+## Elementos del modelo
+
+`coefficients`: es una función que devuelve el vector numérico de coeficientes con sus respectivos nombres
+
+`fitted`: es la función para las predicciones en el conjunto de datos original utilizado para crear el modelo, esta devuelve un vector numérico de los valores ajustados del modelo
+
+`predict`: es una función que se encarga de hacer lo mismo que `fitted`, a diferencia de que a la función `predict` toma dos valores, el primero es el modelo y el segundo la variable explicativa
+
+`residuals`: son una medida de ineactitud en el ajuste del modelo, cada residuo le corresponde a cada uno del conjunto de datos. Cada residuo es el valor de respuesta real menos el valor de respuesta previsto (la predicción)
+
+`summary`: muestra una impresión más extendida de los detalles del modelo
+
+`tidy`: En la paquetería `broom` proporciona funciones que devuelven *data frames* para que sea más sencillo trabajar con estos datos. La función `tidy` devuelve los detalles del coeficiente en un *data frame*.
+
+`augment`: devuelve los resultados del nivel de obervación, cada columna es un argumento que se utilizó para crear el modelo. [`broom`]
+
+`glance`: devuelve los resultados a nivel de modelo, son las métricas que se observaron en el `summary` y algunas otras. [`broom`]
+
+**Importante:** si el modelo tiene un buen ajuste, los *residuos* deben seguir una distribución normal.
+
+```{r, collapse=TRUE}
+head(coefficients(modelo))
+head(fitted(modelo))
+head(residuals(modelo))
+summary(modelo)
+```
+
+Ahora, de la paquetería `broom`, donde se almacenan los datos en un *data frame*.
+
+```{r, collapse=TRUE}
+tidy(modelo)
+augment(modelo)
+glance(modelo)
+```
+
+## Regresión a la medida
+
+La regresión a la medida es una propiedad de los datos, no un tipo de modelo, sino la regresión lineal se pueden utilizar para cuantificar su efecto. Si revisamos el concepto en forma de ecuación es: *valor respuesta = valor ajustado + residual*.
+
+Los residuales pueden existir por dos posibilidades, la primera podría deberse a que el modelo no es el mejor, sin embargo, normalmente no es posible o deseable tener un modelo perfecto, porque el mundo contiene mucha aleatoriedad y el modelo no debe capturar eso, por esto, la segunda posibilidad es la aeatoriedad.
